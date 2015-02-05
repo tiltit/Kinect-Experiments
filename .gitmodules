@@ -1,0 +1,6 @@
+[submodule "cvblob"]
+	path = cvblob
+	url = https://github.com/Steelskin/cvblob.git
+[submodule "libfreenect"]
+	path = libfreenect
+	url = https://github.com/OpenKinect/libfreenect.git
