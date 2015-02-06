@@ -11,7 +11,6 @@ Dependencies:
 * OpenCV
 * CVBlob
 
-Libfreenect and CVBlob have been added to this repository as submodules.
 
 I am also using a widget from here:
 http://qt-project.org/forums/viewthread/19757
