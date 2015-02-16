@@ -110,6 +110,8 @@ void GlView::retrieveImageData()
 {
 	record->getRgb(currentFrame, rgbMat);
 	record->getDepth(currentFrame, depthMat);
+	//
+	//record->getBlobs(currentFrame, blobMat);
 }
 
 void GlView::paintGL() 

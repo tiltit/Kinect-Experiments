@@ -60,8 +60,11 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
               <property name="text">
-               <string>Depth limit min</string>
+               <string>Clip close</string>
               </property>
              </widget>
             </item>
@@ -119,8 +122,11 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
               <property name="text">
-               <string>Depth limit max</string>
+               <string>Clip distant</string>
               </property>
              </widget>
             </item>
@@ -190,8 +196,18 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="6" column="0">
+         <widget class="QSpinBox" name="blobFilterLargeSpinBox">
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>50000</number>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="2">
-         <widget class="QSlider" name="distanceSlider">
+         <widget class="QSlider" name="blobDistanceFilterSlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -216,13 +232,6 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="viewBlobsCheckBox">
-          <property name="text">
-           <string>View blobs</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="2">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
@@ -233,13 +242,16 @@
               <height>0</height>
              </size>
             </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
             <property name="text">
-             <string>The distance</string>
+             <string>Distance filter</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="distanceSpinBox">
+           <widget class="QSpinBox" name="blobDistanceFilterSpinBox">
             <property name="minimumSize">
              <size>
               <width>75</width>
@@ -273,13 +285,16 @@
               <height>0</height>
              </size>
             </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
             <property name="text">
-             <string>The inacative</string>
+             <string>Inactive filter</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="inactiveSpinBox">
+           <widget class="QSpinBox" name="blobInactiveFilterSpinBox">
             <property name="minimumSize">
              <size>
               <width>75</width>
@@ -313,18 +328,11 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QSpinBox" name="blobFilterLargeSpinBox">
-          <property name="maximum">
-           <number>65535</number>
-          </property>
-          <property name="value">
-           <number>50000</number>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_6">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
           <property name="text">
            <string>Blob filter small</string>
           </property>
@@ -332,13 +340,16 @@
         </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_5">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
           <property name="text">
            <string>Blob filter large</string>
           </property>
          </widget>
         </item>
         <item row="6" column="2">
-         <widget class="QSlider" name="inactiveSlider">
+         <widget class="QSlider" name="blobInactiveFilterSlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -349,9 +360,19 @@
      </layout>
     </item>
     <item>
+     <widget class="QPushButton" name="computeButton">
+      <property name="text">
+       <string>Compute Blobs and Tracks</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QLabel" name="label_8">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
         <property name="text">
          <string>Frame number</string>
         </property>
@@ -443,12 +464,36 @@
     </property>
     <addaction name="actionOpen_Folder"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionBlobs"/>
+    <addaction name="actionTracks"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Folder">
    <property name="text">
     <string>open Folder</string>
+   </property>
+  </action>
+  <action name="actionBlobs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Blobs</string>
+   </property>
+  </action>
+  <action name="actionTracks">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tracks</string>
    </property>
   </action>
  </widget>
