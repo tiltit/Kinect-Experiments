@@ -163,8 +163,17 @@
             <property name="maximum">
              <number>65535</number>
             </property>
+            <property name="sliderPosition">
+             <number>0</number>
+            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="invertedAppearance">
+             <bool>false</bool>
+            </property>
+            <property name="invertedControls">
+             <bool>false</bool>
             </property>
             <property name="tickPosition">
              <enum>QSlider::TicksBelow</enum>

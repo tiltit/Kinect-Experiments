@@ -16,6 +16,8 @@
 #include "KinectRecord.h"
 
 
+enum class Display { VIDEO, DEPTH, BLOBS };
+
 class GlView : public QGLWidget
  {
      Q_OBJECT        // must include this if you use Qt signals/slots
@@ -31,6 +33,11 @@ class GlView : public QGLWidget
     void showNextFrame();
     void showPreviousFrame();
     void viewBlobs(bool visible);
+
+    void setLeftDisplay(Display source);
+    void setRightDisplay(Display source);
+
+
     KinectRecord *record;
 
 
@@ -50,6 +57,7 @@ private:
     cv::Mat depthMat;
     cv::Mat depthRgbMat;
     cv::Mat blobMat;
+    cv::Mat blobRgbMat;
     GLuint glDepthTex;
     GLuint glRgbTex;
     QColor selectedColor;
@@ -59,6 +67,8 @@ private:
     FontRender *fontRender;
     Frame *currentFrame;
     bool blobsVisible;
+    Display leftDisplay;
+    Display rightDisplay;
 
 
 private slots:

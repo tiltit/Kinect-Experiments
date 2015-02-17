@@ -27,6 +27,7 @@ GlView::GlView(QWidget *parent)
 	rgbMat = Mat::zeros( Size(640,480), CV_8UC3 );
 	depthMat = Mat::zeros( Size(640,480), CV_16UC1 );
 	blobMat = Mat::zeros( Size(640,480), CV_8UC1 );
+	blobRgbMat = Mat::zeros( Size(640,480), CV_8UC3 );
 	depthRgbMat = Mat::zeros( Size(640,480), CV_8UC3 );
 
 	labelImg=cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
@@ -116,35 +117,59 @@ void GlView::resizeGL(int w, int h)
 
 void GlView::retrieveImageData()
 {
-	record->getRgb(currentFrame, rgbMat);
-	record->getDepth(currentFrame, depthMat);
-	//
-	record->getBlobs(currentFrame, blobMat);
+	if( (leftDisplay == Display::VIDEO) || (rightDisplay == Display::VIDEO)) {
+		record->getRgb(currentFrame, rgbMat);	
+	}
+	if( (leftDisplay == Display::DEPTH) || (rightDisplay == Display::DEPTH)) {
+		record->getDepth(currentFrame, depthMat);
+	}
+	if((leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS)) {
+		record->getBlobs(currentFrame, blobMat);
+	}
 }
 
 void GlView::paintGL() 
 {
 	if(record->getIsOpen()) {
-		uint16_t* depth = (uint16_t*)(depthMat.data);
-		int i;
-		for(i=0;i!=640*480;++i) {
-			// if( (depth[i] > limitDepthMin) && (depth[i] < limitDepthMax)) {
-			if( (depth[i] > record->trackingSettings.clipClose) && (depth[i] < record->trackingSettings.clipDistant)) {
-				// This is what is selected
-				depthRgbMat.data[i*3] = selectedColor.blue();
-			 	depthRgbMat.data[i*3+1] = selectedColor.green();
-			 	depthRgbMat.data[i*3+2] = selectedColor.red();
-			 	//blobMat.data[i]=255;
-			} else {
-				// This is what is cliped
-				depthRgbMat.data[i*3] = hsvLookup[depth[i]][0];
-				depthRgbMat.data[i*3+1] = hsvLookup[depth[i]][1];
-				depthRgbMat.data[i*3+2] = hsvLookup[depth[i]][2];
-				//blobMat.data[i]=0;
+
+		if( (leftDisplay == Display::DEPTH) || (rightDisplay == Display::DEPTH)) {
+			uint16_t* depth = (uint16_t*)(depthMat.data);
+			for(int i=0;i!=640*480;++i) {
+				// if( (depth[i] > limitDepthMin) && (depth[i] < limitDepthMax)) {
+				if( (depth[i] > record->trackingSettings.clipClose) && (depth[i] < record->trackingSettings.clipDistant)) {
+					// This is what is selected
+					depthRgbMat.data[i*3] = selectedColor.blue();
+				 	depthRgbMat.data[i*3+1] = selectedColor.green();
+				 	depthRgbMat.data[i*3+2] = selectedColor.red();
+				 	//blobMat.data[i]=255;
+				} else {
+					// This is what is cliped
+					depthRgbMat.data[i*3] = hsvLookup[depth[i]][0];
+					depthRgbMat.data[i*3+1] = hsvLookup[depth[i]][1];
+					depthRgbMat.data[i*3+2] = hsvLookup[depth[i]][2];
+					//blobMat.data[i]=0;
+				}
 			}
 		}
 
+		if( (leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS) ) {
+			uint8_t* blobData = (uint8_t*)(blobMat.data);
+			for(int i=0;i!=640*480;++i) {
+				if( blobData[i] > 0 ) {
+					blobRgbMat.data[i*3] = selectedColor.blue();
+				 	blobRgbMat.data[i*3+1] = selectedColor.green();
+				 	blobRgbMat.data[i*3+2] = selectedColor.red();
+				} else {
+					blobRgbMat.data[i*3] = 0;
+					blobRgbMat.data[i*3+1] = 0;
+					blobRgbMat.data[i*3+2] = 0;
+				}
+			}
+		}
+
+		// Left View
 		glBindTexture(GL_TEXTURE_2D, glRgbTex);
+		//switch(leftDisplay)
 		glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -154,8 +179,21 @@ void GlView::paintGL()
 		glTexCoord2f(0, 1); glVertex3f(0,480,0);
 		glEnd();
 
+
+		// Right View
 		glBindTexture(GL_TEXTURE_2D, glDepthTex);
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
+		switch(rightDisplay) {
+			case Display::VIDEO:
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
+				break;
+			case Display::DEPTH: 
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
+				break;
+			case Display::BLOBS: 
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, blobRgbMat.cols, blobRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, blobRgbMat.data);
+				break;
+		}
+		//glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0, 0); glVertex3f(640,0,0);
@@ -233,3 +271,12 @@ void GlView::showNextFrame()
 	this->updateGL();
 }
 
+void GlView::setLeftDisplay(Display source)
+{
+	leftDisplay = source;
+}
+
+void GlView::setRightDisplay(Display source)
+{
+	rightDisplay = source;
+}

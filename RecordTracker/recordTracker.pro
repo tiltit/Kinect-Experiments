@@ -1,4 +1,7 @@
 CONFIG += qt debug
+
+QMAKE_CXXFLAGS += -std=c++11
+
 SOURCES += main.cpp MainWindow.cpp glView.cpp colorwheel.cpp FontRender.cpp KinectRecord.cpp split.cpp
 HEADERS += ui_mainwindow.h MainWindow.h glView.h colorwheel.h FontRender.h KinectRecord.h split.h
 

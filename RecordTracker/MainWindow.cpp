@@ -45,13 +45,15 @@ MainWindow::MainWindow(QMainWindow *parent)
 	rightViewGroup->addAction(actionVideoRight);
 	actionDepthRight->setChecked(true);
 	connect(rightViewGroup, SIGNAL(triggered(QAction*)), this, SLOT(onRightViewGroupTriggered(QAction*)));
+	glView->setRightDisplay(Display::DEPTH);
 
 	leftViewGroup = new QActionGroup(this);
 	leftViewGroup->addAction(actionDepthLeft);
 	leftViewGroup->addAction(actionBlobsLeft);
 	leftViewGroup->addAction(actionVideoLeft);
-	actionDepthLeft->setChecked(true);
+	actionVideoLeft->setChecked(true);
 	connect(leftViewGroup, SIGNAL(triggered(QAction*)), this, SLOT(onLeftViewGroupTriggered(QAction*)));
+	glView->setLeftDisplay(Display::VIDEO);
 
 	loadSettings();
 }
@@ -195,10 +197,22 @@ void MainWindow::onBlobInactiveFilterSliderChange( int value )
 
 void MainWindow::onRightViewGroupTriggered(QAction * action)
 {
-	
+	if (actionDepthRight->isChecked()) {
+		glView->setRightDisplay(Display::DEPTH);
+	} else if (actionBlobsRight->isChecked()) {
+		glView->setRightDisplay(Display::BLOBS);
+	} else if (actionVideoRight->isChecked()) {
+		glView->setRightDisplay(Display::VIDEO);
+	}
 }
 
 void MainWindow::onLeftViewGroupTriggered(QAction * action)
 {
-	
+	if (actionDepthLeft->isChecked()) {
+		glView->setLeftDisplay(Display::DEPTH);
+	} else if (actionBlobsLeft->isChecked()) {
+		glView->setLeftDisplay(Display::BLOBS);
+	} else if (actionVideoLeft->isChecked()) {
+		glView->setLeftDisplay(Display::VIDEO);
+	}	
 }
