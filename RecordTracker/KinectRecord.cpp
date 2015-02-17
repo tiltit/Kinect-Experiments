@@ -9,6 +9,7 @@
 
 using namespace std;
 using namespace cv;
+using namespace cvb;
 
 
 KinectRecord::KinectRecord()
@@ -154,6 +155,36 @@ int KinectRecord::getRgb(Frame *frame, Mat& output)
     mat = imread(rgbFrame->fileName.c_str(), CV_LOAD_IMAGE_COLOR); 
     mat.copyTo(output);
     return 1;
+}
+
+int KinectRecord::getBlobs(Frame *frame, Mat& output)
+{
+	Mat blobMat;
+	blobMat = imread(frame->fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+
+	// Pity the that the folowing two line do not work...
+	//threshold(blobMat, blobMat, trackingSettings.clipClose, trackingSettings.clipDistant, CV_THRESH_BINARY);
+	//blobMat.convertTo(blobMat, CV_8U, 0.00390625);
+
+	uint16_t* depth = (uint16_t*)(blobMat.data);
+	for(int i=0;i!=640*480;++i) {
+		if( (depth[i] > trackingSettings.clipClose) && (depth[i] < trackingSettings.clipDistant)) {
+			depth[i] = 255;	// This is what is selected
+		} else {
+			depth[i] = 0; // This is not selected
+		}
+	}
+	blobMat.convertTo(blobMat, CV_8U);	// This function clips the most significant byte unless the scale ratio is specified in the third argument. 
+
+	IplImage *labelImg = cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
+
+	IplImage *blobIpl = new IplImage(blobMat);
+	CvBlobs blobs;
+	unsigned int result=cvLabel(blobIpl, labelImg, blobs);
+	blobMat = cvarrToMat(blobIpl, true);
+	blobMat.copyTo(output);
+	cvReleaseBlobs(blobs);
+	return 1;
 }
 
 bool KinectRecord::getIsOpen()

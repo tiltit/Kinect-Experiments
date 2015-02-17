@@ -22,8 +22,6 @@ class GlView : public QGLWidget
 
  public:
     GlView(QWidget *parent = 0);
-    void setLimitDepthMin(int depth);
-    void setLimitDepthMax(int depth);
     void setSelectedColor(QColor color);
     QVector<QColor*>* computeGoldenRatioColors(double startHue,double saturation, double value, int size);
     void computeHue();
@@ -32,6 +30,8 @@ class GlView : public QGLWidget
     void showFrame(int frameIndex);
     void showNextFrame();
     void showPreviousFrame();
+    void viewBlobs(bool visible);
+    KinectRecord *record;
 
 
  protected:
@@ -52,15 +52,14 @@ private:
     cv::Mat blobMat;
     GLuint glDepthTex;
     GLuint glRgbTex;
-    int limitDepthMin;
-    int limitDepthMax;
     QColor selectedColor;
     cvb::CvTracks tracks;
     IplImage *labelImg;
     QVector<QColor*> *colorVector;
     FontRender *fontRender;
-    KinectRecord *record;
     Frame *currentFrame;
+    bool blobsVisible;
+
 
 private slots:
 

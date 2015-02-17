@@ -30,7 +30,15 @@ GlView::GlView(QWidget *parent)
 	depthRgbMat = Mat::zeros( Size(640,480), CV_8UC3 );
 
 	labelImg=cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
+
+	blobsVisible = false;
 }
+
+void GlView::viewBlobs(bool visible) 
+{ 
+	blobsVisible = visible; 
+}
+
 
 QVector<QColor*>* GlView::computeGoldenRatioColors(double startHue,double saturation, double value, int size) 
 {
@@ -111,7 +119,7 @@ void GlView::retrieveImageData()
 	record->getRgb(currentFrame, rgbMat);
 	record->getDepth(currentFrame, depthMat);
 	//
-	//record->getBlobs(currentFrame, blobMat);
+	record->getBlobs(currentFrame, blobMat);
 }
 
 void GlView::paintGL() 
@@ -120,12 +128,15 @@ void GlView::paintGL()
 		uint16_t* depth = (uint16_t*)(depthMat.data);
 		int i;
 		for(i=0;i!=640*480;++i) {
-			 if( (depth[i] > limitDepthMin) && (depth[i] < limitDepthMax)) {
-			 	depthRgbMat.data[i*3] = selectedColor.blue();
+			// if( (depth[i] > limitDepthMin) && (depth[i] < limitDepthMax)) {
+			if( (depth[i] > record->trackingSettings.clipClose) && (depth[i] < record->trackingSettings.clipDistant)) {
+				// This is what is selected
+				depthRgbMat.data[i*3] = selectedColor.blue();
 			 	depthRgbMat.data[i*3+1] = selectedColor.green();
 			 	depthRgbMat.data[i*3+2] = selectedColor.red();
 			 	//blobMat.data[i]=255;
 			} else {
+				// This is what is cliped
 				depthRgbMat.data[i*3] = hsvLookup[depth[i]][0];
 				depthRgbMat.data[i*3+1] = hsvLookup[depth[i]][1];
 				depthRgbMat.data[i*3+2] = hsvLookup[depth[i]][2];
@@ -180,17 +191,6 @@ void GlView::paintGL()
 // 		break;
 // 	}
 // }
-
-void GlView::setLimitDepthMax(int depth)
-{
-	limitDepthMax = depth;
-}
-
-void GlView::setLimitDepthMin(int depth)
-{
-	limitDepthMin = depth;
-}
-
 
 void GlView::setSelectedColor(QColor color)
 {

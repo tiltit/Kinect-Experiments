@@ -362,7 +362,7 @@
     <item>
      <widget class="QPushButton" name="computeButton">
       <property name="text">
-       <string>Compute Blobs and Tracks</string>
+       <string>Compute Tracks</string>
       </property>
      </widget>
     </item>
@@ -413,38 +413,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="previousFrameButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Previous</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="nextFrameButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Next</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
    </layout>
@@ -466,13 +434,27 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>Left View</string>
     </property>
-    <addaction name="actionBlobs"/>
-    <addaction name="actionTracks"/>
+    <addaction name="actionBlobsLeft"/>
+    <addaction name="actionDepthLeft"/>
+    <addaction name="actionVideoLeft"/>
+    <addaction name="separator"/>
+    <addaction name="actionTracksLeft"/>
+   </widget>
+   <widget class="QMenu" name="menuRight_View">
+    <property name="title">
+     <string>Right View</string>
+    </property>
+    <addaction name="actionDepthRight"/>
+    <addaction name="actionBlobsRight"/>
+    <addaction name="actionVideoRight"/>
+    <addaction name="separator"/>
+    <addaction name="actionTracksRight"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
+   <addaction name="menuRight_View"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen_Folder">
@@ -480,7 +462,7 @@
     <string>open Folder</string>
    </property>
   </action>
-  <action name="actionBlobs">
+  <action name="actionBlobsLeft">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -488,12 +470,63 @@
     <string>Blobs</string>
    </property>
   </action>
-  <action name="actionTracks">
+  <action name="actionTracksLeft">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
     <string>Tracks</string>
+   </property>
+  </action>
+  <action name="actionDepthRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Depth</string>
+   </property>
+  </action>
+  <action name="actionBlobsRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Blobs</string>
+   </property>
+  </action>
+  <action name="actionVideoRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Video</string>
+   </property>
+  </action>
+  <action name="actionTracksRight">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tracks</string>
+   </property>
+  </action>
+  <action name="actionDepthLeft">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Depth</string>
+   </property>
+  </action>
+  <action name="actionVideoLeft">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Video</string>
    </property>
   </action>
  </widget>
