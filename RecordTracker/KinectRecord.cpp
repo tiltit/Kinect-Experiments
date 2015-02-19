@@ -191,3 +191,14 @@ bool KinectRecord::getIsOpen()
 {
 	return isOpen;
 }
+
+int KinectRecord::computeTracks()
+{
+	if(isOpen) {
+
+		
+		return 1;
+	} else {
+		return 0;
+	}
+}

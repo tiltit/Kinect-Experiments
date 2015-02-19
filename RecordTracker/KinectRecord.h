@@ -43,6 +43,7 @@ public:
 	int getRgb(Frame *frame, cv::Mat& output);
 	int getBlobs(Frame *frame, cv::Mat& output);
 	bool getIsOpen();
+	int computeTracks();
 
 	struct TrackingSettings trackingSettings;
 

@@ -39,6 +39,8 @@ MainWindow::MainWindow(QMainWindow *parent)
 	connect(blobInactiveFilterSlider, SIGNAL(valueChanged(int)), blobInactiveFilterSpinBox, SLOT(setValue(int)));
 	connect(blobInactiveFilterSpinBox, SIGNAL(valueChanged(int)), blobInactiveFilterSlider, SLOT(setValue(int)));
 
+	connect(computeButton, SIGNAL(clicked()), this, SLOT(onComputeButtonClicked()));
+
 	rightViewGroup = new QActionGroup(this);
 	rightViewGroup->addAction(actionDepthRight);
 	rightViewGroup->addAction(actionBlobsRight);
@@ -215,4 +217,9 @@ void MainWindow::onLeftViewGroupTriggered(QAction * action)
 	} else if (actionVideoLeft->isChecked()) {
 		glView->setLeftDisplay(Display::VIDEO);
 	}	
+}
+
+void MainWindow::onComputeButtonClicked()
+{
+	glView->record->computeTracks();
 }

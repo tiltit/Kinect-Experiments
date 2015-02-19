@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow, private Ui::UiMainWindow
 
 		void onRightViewGroupTriggered( QAction * action);
 		void onLeftViewGroupTriggered( QAction * action);
+		void onComputeButtonClicked();
 }; 
 
 #endif

@@ -169,8 +169,19 @@ void GlView::paintGL()
 
 		// Left View
 		glBindTexture(GL_TEXTURE_2D, glRgbTex);
-		//switch(leftDisplay)
-		glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
+		
+		//glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
+		switch(leftDisplay) {
+			case Display::VIDEO:
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
+				break;
+			case Display::DEPTH: 
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
+				break;
+			case Display::BLOBS: 
+				glTexImage2D(GL_TEXTURE_2D, 0, 3, blobRgbMat.cols, blobRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, blobRgbMat.data);
+				break;
+		}
 		glBegin(GL_TRIANGLE_FAN);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glTexCoord2f(0, 0); glVertex3f(0,0,0);
