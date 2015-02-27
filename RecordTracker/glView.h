@@ -44,6 +44,7 @@ class GlView : public QGLWidget
  protected:
     void initializeGL();
     void resizeGL(int w, int h);
+    void drawBlobs(int xOffset);
     void paintGL();
     //void mousePressEvent(QMouseEvent *event);
     //void mouseMoveEvent(QMouseEvent *event);
@@ -58,6 +59,7 @@ private:
     cv::Mat depthRgbMat;
     cv::Mat blobMat;
     cv::Mat blobRgbMat;
+    cvb::CvBlobs blobs;
     GLuint glDepthTex;
     GLuint glRgbTex;
     QColor selectedColor;
@@ -65,7 +67,7 @@ private:
     IplImage *labelImg;
     QVector<QColor*> *colorVector;
     FontRender *fontRender;
-    Frame *currentFrame;
+    Frames *currentFrames;
     bool blobsVisible;
     Display leftDisplay;
     Display rightDisplay;

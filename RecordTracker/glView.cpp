@@ -118,14 +118,39 @@ void GlView::resizeGL(int w, int h)
 void GlView::retrieveImageData()
 {
 	if( (leftDisplay == Display::VIDEO) || (rightDisplay == Display::VIDEO)) {
-		record->getRgb(currentFrame, rgbMat);	
+		record->getRgb(currentFrames, rgbMat);	
 	}
 	if( (leftDisplay == Display::DEPTH) || (rightDisplay == Display::DEPTH)) {
-		record->getDepth(currentFrame, depthMat);
+		record->getDepth(currentFrames, depthMat);
 	}
 	if((leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS)) {
-		record->getBlobs(currentFrame, blobMat);
+		record->getBlobs(currentFrames, blobMat, blobs);
 	}
+}
+
+void GlView::drawBlobs(int xOffset)
+{
+	glDisable(GL_TEXTURE_2D);
+
+	for(CvBlobs::iterator it=blobs.begin(); it!=blobs.end(); ++it) {
+		CvBlob *blob = (*it).second;
+		glLineWidth(2);
+		glColor3f(1.0, 1.0, 1.0);
+
+		glBegin(GL_LINE_STRIP);
+
+		glVertex2f(blob->minx + xOffset, blob->miny); 
+		glVertex2f(blob->maxx + xOffset, blob->miny);
+		glVertex2f(blob->maxx + xOffset, blob->maxy); 
+		glVertex2f(blob->minx + xOffset, blob->maxy);
+		glVertex2f(blob->minx + xOffset, blob->miny);
+
+		glEnd();
+		fontRender->setColor(QColor(0,255,255));
+		fontRender->print(blob->minx + xOffset, blob->miny - 20, QString::number(blob->area));
+	}
+
+	glEnable(GL_TEXTURE_2D);
 }
 
 void GlView::paintGL() 
@@ -190,6 +215,9 @@ void GlView::paintGL()
 		glTexCoord2f(0, 1); glVertex3f(0,480,0);
 		glEnd();
 
+		if(leftDisplay == Display::BLOBS) {
+			drawBlobs(0);
+		}
 
 		// Right View
 		glBindTexture(GL_TEXTURE_2D, glDepthTex);
@@ -212,6 +240,10 @@ void GlView::paintGL()
 		glTexCoord2f(1, 1); glVertex3f(1280,480,0);
 		glTexCoord2f(0, 1); glVertex3f(640,480,0);
 		glEnd();
+
+		if(rightDisplay == Display::BLOBS) {
+			drawBlobs(640);
+		}
 
 	}
 
@@ -250,8 +282,8 @@ int GlView::openRecord(QString fileName)
 {
 
 	if(record->open(fileName.toStdString())) {
-		//currentFrame = record->getFrame(0);
-		currentFrame = record->getCurrentFrame();
+		//currentFrame = record->getCurrentFrame();
+		currentFrames = record->getCurrentFrames();
 		retrieveImageData();
 		qDebug() << "done loop";
 		this->updateGL();
@@ -263,21 +295,21 @@ int GlView::openRecord(QString fileName)
 
 void GlView::showFrame(int frameIndex)
 {
-	currentFrame = record->getFrame(frameIndex);
+	currentFrames = record->getFrames(frameIndex);
 	retrieveImageData();
 	this->updateGL();
 }
 
 void GlView::showPreviousFrame()
 {
-	currentFrame = record->getPreviousFrame();
+	currentFrames = record->getPreviousFrames();
 	retrieveImageData();
 	this->updateGL();
 }
 
 void GlView::showNextFrame()
 {
-	currentFrame = record->getNextFrame();
+	currentFrames = record->getNextFrames();
 	retrieveImageData();
 	this->updateGL();
 }

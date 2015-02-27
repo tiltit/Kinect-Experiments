@@ -19,6 +19,14 @@ struct Frame
 	std::string fileName;
 };
 
+struct Frames
+{
+	Frame rgbFrame;
+	Frame depthFrame;
+	cvb::CvBlobs blobs;
+	cvb::CvTracks tracks;
+};
+
 struct TrackingSettings {
 	uint16_t clipClose;
 	uint16_t clipDistant;
@@ -32,16 +40,17 @@ class KinectRecord
 {
 public:
 	KinectRecord();
+	Frame getRgbFrameFromCurrenttime(double currenttime, std::vector<Frame*> rgbFrames );
 	int open(std::string fileName);
 	int close();
-	Frame* getCurrentFrame(void);
-	Frame* getNextFrame(void);
-	Frame* getPreviousFrame(void);
-	Frame* getFrame(int index);
+	Frames* getCurrentFrames(void);
+	Frames* getNextFrames(void);
+	Frames* getPreviousFrames(void);
+	Frames* getFrames(int index);
 	int getNumberOfFrames(void);
-	int getDepth(Frame *frame, cv::Mat& output);
-	int getRgb(Frame *frame, cv::Mat& output);
-	int getBlobs(Frame *frame, cv::Mat& output);
+	int getDepth(Frames *f, cv::Mat& output);
+	int getRgb(Frames *f, cv::Mat& output);
+	int getBlobs(Frames *f, cv::Mat& output, cvb::CvBlobs& blobs);
 	bool getIsOpen();
 	int computeTracks();
 
@@ -50,8 +59,7 @@ public:
 protected:
 	int currentFrame;
 	int nbrOfFrames;
-	std::vector<Frame*> rgbFrames;
-	std::vector<Frame*> depthFrames;
+	std::vector<Frames*> frames;
 	bool isOpen;
 	std::string recordDirectory;
 private:

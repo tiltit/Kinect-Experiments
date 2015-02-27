@@ -17,8 +17,21 @@ KinectRecord::KinectRecord()
 	isOpen = false;
 }
 
+Frame KinectRecord::getRgbFrameFromCurrenttime( double currenttime, vector<Frame*> rgbFrames ) 
+{
+    Frame rgbFrame;
+    for(vector<Frame*>::iterator it = rgbFrames.begin();it!= rgbFrames.end();++it) {
+    	rgbFrame = **it;
+    	if(rgbFrame.currenttime > currenttime)
+    		break;
+    }
+    return rgbFrame;
+}
+
 int KinectRecord::open(string fileName)
 {
+	std::vector<Frame*> rgbFrames;
+	std::vector<Frame*> depthFrames;
 	cout.precision(15);
 	boost::filesystem::path p(fileName); 
 	recordDirectory = p.parent_path().generic_string();
@@ -42,6 +55,7 @@ int KinectRecord::open(string fileName)
 
     rgbFrames.clear();
     depthFrames.clear();
+    frames.clear();
 
     vector<string> frameInfo;
 
@@ -78,6 +92,22 @@ int KinectRecord::open(string fileName)
     cout << "RGB Frames:" << '\t' << rgbFrames.size() << endl;
     cout << "Depth Frames:" << '\t' << depthFrames.size() << endl;
 
+	for(vector<Frame*>::iterator it = depthFrames.begin(); it != depthFrames.end(); ++it) {
+		Frames *f = new Frames;
+		f->depthFrame = **it;
+		f->rgbFrame = getRgbFrameFromCurrenttime((*it)->currenttime, rgbFrames);
+		frames.push_back(f);
+	}
+
+	// Small test
+	// for(vector<Frames*>::iterator it = frames.begin(); it != frames.end(); ++it) {
+	// 	cout << (*it)->rgbFrame.fileName << endl;
+	// 	cout << (*it)->depthFrame.fileName << endl;
+	// }
+
+	rgbFrames.clear();
+	depthFrames.clear();
+
     isOpen = true;
     currentFrame = 0;
 	return 1;
@@ -85,82 +115,61 @@ int KinectRecord::open(string fileName)
 
 int KinectRecord::close()
 {
-	rgbFrames.clear();
-	depthFrames.clear();
+	frames.clear();
 	isOpen = false;
 	return 0;
 }
 
-Frame* KinectRecord::getCurrentFrame(void)
+Frames* KinectRecord::getCurrentFrames(void)
 {
-	return depthFrames.at(currentFrame);
+	return frames.at(currentFrame);
 }
 
-Frame* KinectRecord::getNextFrame(void)
+Frames* KinectRecord::getNextFrames(void)
 {
-	if(currentFrame < depthFrames.size()-1 )
+	if( currentFrame < frames.size()-1 )
 		currentFrame++;
-	return depthFrames.at(currentFrame);
+	return frames.at(currentFrame);
 }
 
-Frame* KinectRecord::getPreviousFrame(void)
+Frames* KinectRecord::getPreviousFrames(void)
 {
 	if(currentFrame > 0 )
 		currentFrame--;
-	return depthFrames.at(currentFrame);
+	return frames.at(currentFrame);
 }
 
-Frame* KinectRecord::getFrame(int index)
+Frames* KinectRecord::getFrames(int index)
 {
 	currentFrame = index;
-	return depthFrames.at(currentFrame);
+	return frames.at(currentFrame);
 }
 
 int KinectRecord::getNumberOfFrames(void)
 {
-	return depthFrames.size();
+	return frames.size();
 }
 
-int KinectRecord::getDepth(Frame *frame, Mat& output)
+int KinectRecord::getDepth(Frames *f, Mat& output)
 {
-
-	// if(depthMat != NULL)
-	// 	delete depthMat;
-	// depthMat = new cv::Mat(Size(640,480),CV_16UC1);
-
- //    *depthMat = imread(frame->fileName, CV_LOAD_IMAGE_GRAYSCALE);
- //    return depthMat;
-
 	Mat mat;
-	mat = imread(frame->fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+	mat = imread(f->depthFrame.fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
 	mat.copyTo(output);
 	return 1;
 }
 
-int KinectRecord::getRgb(Frame *frame, Mat& output)
+int KinectRecord::getRgb(Frames *f, Mat& output)
 {
-	// if(rgbMat != NULL) {
-	// 	delete rgbMat;
-	// }
-	// rgbMat = new cv::Mat(Size(640,480),CV_8UC3);
-    vector<Frame*>::iterator it;
-    Frame *rgbFrame;
-    for(it = rgbFrames.begin();it!= rgbFrames.end();++it) {
-    	rgbFrame = *it;
-    	if(rgbFrame->currenttime > frame->currenttime)
-    		break;
-    }
-    //rgbMat = imread(rgbFrame->fileName, CV_LOAD_IMAGE_COLOR);
     Mat mat;
-    mat = imread(rgbFrame->fileName.c_str(), CV_LOAD_IMAGE_COLOR); 
+    mat = imread(f->rgbFrame.fileName.c_str(), CV_LOAD_IMAGE_COLOR); 
     mat.copyTo(output);
     return 1;
 }
 
-int KinectRecord::getBlobs(Frame *frame, Mat& output)
+int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
 {
 	Mat blobMat;
-	blobMat = imread(frame->fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+	blobMat = imread(f->depthFrame.fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
 
 	// Pity the that the folowing two line do not work...
 	//threshold(blobMat, blobMat, trackingSettings.clipClose, trackingSettings.clipDistant, CV_THRESH_BINARY);
@@ -179,12 +188,22 @@ int KinectRecord::getBlobs(Frame *frame, Mat& output)
 	IplImage *labelImg = cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
 
 	IplImage *blobIpl = new IplImage(blobMat);
-	CvBlobs blobs;
-	unsigned int result=cvLabel(blobIpl, labelImg, blobs);
+	//CvBlobs blobs;
+	unsigned int result=cvLabel(blobIpl, labelImg, f->blobs);
+	cvFilterByArea(f->blobs, trackingSettings.blobFilterSmall, trackingSettings.blobFilterLarge);
 	blobMat = cvarrToMat(blobIpl, true);
 	blobMat.copyTo(output);
-	cvReleaseBlobs(blobs);
-	return 1;
+	//cvReleaseBlobs(f->blobs);
+	//f->blobs = blobs;
+	//cvReleaseBlobs(blobs);
+	for (CvBlobs::const_iterator it=f->blobs.begin(); it!=f->blobs.end(); ++it) {
+		cout << "Blob #" << it->second->label << ": Area=" << it->second->area << endl;
+	}
+	cout << endl;
+
+	blobs = f->blobs;
+	
+	return result;
 }
 
 bool KinectRecord::getIsOpen()
@@ -194,9 +213,12 @@ bool KinectRecord::getIsOpen()
 
 int KinectRecord::computeTracks()
 {
+	int i;
 	if(isOpen) {
+		for(vector<Frames*>::iterator it = frames.begin(); it != frames.end(); ++it) {
 
-		
+		}
+
 		return 1;
 	} else {
 		return 0;

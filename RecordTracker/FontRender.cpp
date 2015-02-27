@@ -97,3 +97,7 @@ void FontRender::print(int x_offset, int y_offset, QString s)
 void FontRender::setColor(QColor color) {
 	textColor = color;
 }
+
+void FontRender::setColor(uint8_t r, uint8_t g, uint8_t b) {
+	textColor = QColor(r,g,b);
+}

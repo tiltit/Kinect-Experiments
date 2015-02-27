@@ -28,6 +28,7 @@ class FontRender : public QObject
 		void print(int x_offset, int y_offset, QString s);
 		void setColor(QRgb);
 		void setColor(QColor color);
+		void setColor(uint8_t r, uint8_t g, uint8_t b);
 
 	protected:
 

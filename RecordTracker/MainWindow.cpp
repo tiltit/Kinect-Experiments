@@ -96,6 +96,12 @@ void MainWindow::loadSettings()
 	blobDistanceFilterSlider->setValue(glView->record->trackingSettings.blobDistanceFilter);
 	blobInactiveFilterSlider->setValue(glView->record->trackingSettings.blobInactiveFilter);
 
+	colorWheel->setColor(QColor(
+		settings.value("colorWheelRed").toString().toInt(),
+		settings.value("colorWheelGreen").toString().toInt(),
+		settings.value("colorWheelBlue").toString().toInt()
+	));
+
 }
 
 void MainWindow::saveSettings()
@@ -109,6 +115,10 @@ void MainWindow::saveSettings()
 	settings.setValue("blobFilterLarge", QString::number(glView->record->trackingSettings.blobFilterLarge));
 	settings.setValue("blobDistanceFilter", QString::number(glView->record->trackingSettings.blobDistanceFilter));
 	settings.setValue("blobInactiveFilter", QString::number(glView->record->trackingSettings.blobInactiveFilter));
+	
+	settings.setValue("colorWheelRed", QString::number(colorWheel->color().red()));
+	settings.setValue("colorWheelGreen", QString::number(colorWheel->color().green()));
+	settings.setValue("colorWheelBlue", QString::number(colorWheel->color().blue()));
 }
 
 void MainWindow::actionOpenFolderTriggered() 
