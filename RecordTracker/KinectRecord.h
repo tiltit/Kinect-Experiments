@@ -11,15 +11,15 @@
 
 #include <cvblob.h>
 
-struct miniTrack {
+struct MiniTrack {
 	uint16_t id;
 	uint16_t minx;
-    uint16_t maxx;
-    uint16_t miny;
-    uint16_t maxy;
-    uint16_t centroidX;
-    uint16_t centroidY;
-    uint16_t depth;
+	uint16_t maxx;
+	uint16_t miny;
+	uint16_t maxy;
+	uint16_t centroidX;
+	uint16_t centroidY;
+	uint16_t depth;
 };
 
 struct Frame
@@ -35,7 +35,7 @@ struct Frames
 	Frame rgbFrame;
 	Frame depthFrame;
 	cvb::CvBlobs blobs;
-	std::vector<Frames*> frames;
+	std::map<MiniTrack*> miniTracks;
 };
 
 struct TrackingSettings {
