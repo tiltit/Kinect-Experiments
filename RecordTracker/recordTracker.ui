@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>660</width>
-    <height>657</height>
+    <height>652</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -205,16 +205,6 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="6" column="0">
-         <widget class="QSpinBox" name="blobFilterLargeSpinBox">
-          <property name="maximum">
-           <number>65535</number>
-          </property>
-          <property name="value">
-           <number>50000</number>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="2">
          <widget class="QSlider" name="blobDistanceFilterSlider">
           <property name="orientation">
@@ -310,6 +300,38 @@
               <height>0</height>
              </size>
             </property>
+            <property name="maximum">
+             <number>500</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="text">
+             <string>Active filter</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="blobActiveFilterSpinBox">
+            <property name="minimumSize">
+             <size>
+              <width>75</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>500</number>
+            </property>
+            <property name="value">
+             <number>20</number>
+            </property>
            </widget>
           </item>
           <item>
@@ -357,23 +379,29 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="2">
-         <widget class="QSlider" name="blobInactiveFilterSlider">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="5" column="0">
+         <widget class="QSpinBox" name="blobFilterLargeSpinBox">
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>50000</number>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QPushButton" name="computeButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Compute Tracks</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QPushButton" name="computeButton">
-      <property name="text">
-       <string>Compute Tracks</string>
-      </property>
-     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">

@@ -35,9 +35,8 @@ MainWindow::MainWindow(QMainWindow *parent)
 	connect(blobDistanceFilterSlider, SIGNAL(valueChanged(int)), blobDistanceFilterSpinBox, SLOT(setValue(int)));
 	connect(blobDistanceFilterSpinBox, SIGNAL(valueChanged(int)), blobDistanceFilterSlider, SLOT(setValue(int)));	
 
-	connect(blobInactiveFilterSlider, SIGNAL(valueChanged(int)), this, SLOT(onBlobInactiveFilterSliderChange(int)));
-	connect(blobInactiveFilterSlider, SIGNAL(valueChanged(int)), blobInactiveFilterSpinBox, SLOT(setValue(int)));
-	connect(blobInactiveFilterSpinBox, SIGNAL(valueChanged(int)), blobInactiveFilterSlider, SLOT(setValue(int)));
+	connect(blobInactiveFilterSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onBlobInactiveFilterSpinBoxChange(int)));
+	connect(blobActiveFilterSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onBlobActiveFilterSpinBoxChange(int)));
 
 	connect(computeButton, SIGNAL(clicked()), this, SLOT(onComputeButtonClicked()));
 
@@ -84,17 +83,20 @@ void MainWindow::loadSettings()
 	glView->record->trackingSettings.blobFilterLarge = (setting != "") ? setting.toInt() : blobFilterLargeSpinBox->value();
 
 	setting = settings.value("blobDistanceFilter").toString();
-	glView->record->trackingSettings.blobDistanceFilter = (setting != "") ? setting.toInt() : 0;
+	glView->record->trackingSettings.blobDistanceFilter = (setting != "") ? setting.toInt() : blobDistanceFilterSpinBox->value();
 
 	setting = settings.value("blobInactiveFilter").toString();
-	glView->record->trackingSettings.blobInactiveFilter = (setting != "") ? setting.toInt() : 0;
+	glView->record->trackingSettings.blobInactiveFilter = (setting != "") ? setting.toInt() : blobInactiveFilterSpinBox->value();
+
+	setting = settings.value("blobActiveFilter").toString();
+	glView->record->trackingSettings.blobActiveFilter = (setting != "") ? setting.toInt() : blobActiveFilterSpinBox->value();
 
 	depthMinSlider->setValue(glView->record->trackingSettings.clipClose);	
 	depthMaxSlider->setValue(glView->record->trackingSettings.clipDistant);
 	blobFilterSmallSpinBox->setValue(glView->record->trackingSettings.blobFilterSmall);
 	blobFilterLargeSpinBox->setValue(glView->record->trackingSettings.blobFilterLarge);
 	blobDistanceFilterSlider->setValue(glView->record->trackingSettings.blobDistanceFilter);
-	blobInactiveFilterSlider->setValue(glView->record->trackingSettings.blobInactiveFilter);
+	blobInactiveFilterSpinBox->setValue(glView->record->trackingSettings.blobInactiveFilter);
 
 	colorWheel->setColor(QColor(
 		settings.value("colorWheelRed").toString().toInt(),
@@ -115,6 +117,7 @@ void MainWindow::saveSettings()
 	settings.setValue("blobFilterLarge", QString::number(glView->record->trackingSettings.blobFilterLarge));
 	settings.setValue("blobDistanceFilter", QString::number(glView->record->trackingSettings.blobDistanceFilter));
 	settings.setValue("blobInactiveFilter", QString::number(glView->record->trackingSettings.blobInactiveFilter));
+	settings.setValue("blobActiveFilter", QString::number(glView->record->trackingSettings.blobActiveFilter));
 	
 	settings.setValue("colorWheelRed", QString::number(colorWheel->color().red()));
 	settings.setValue("colorWheelGreen", QString::number(colorWheel->color().green()));
@@ -154,6 +157,7 @@ void MainWindow::actionOpenFolderTriggered()
 		frameNumberSpinBox->setMaximum(glView->getRecordLength());
 		frameSlider->setEnabled(true);
 		frameSlider->setMaximum(glView->getRecordLength());
+		computeButton->setEnabled(true);
 	}
 }
 
@@ -169,42 +173,51 @@ void MainWindow::onFrameSliderChange( int value )
 void MainWindow::onDepthMinSliderChange( int value )
 {
 	glView->record->trackingSettings.clipClose = value;
-	glView->updateGL();
+	glView->refreshFrames();
 }
 
 void MainWindow::onDepthMaxSliderChange( int value )
 {
 	glView->record->trackingSettings.clipDistant = value;
-	glView->updateGL();
+	glView->refreshFrames();
 
 }
 
 void MainWindow::onColorWheelColorChange( QColor color )
 {
 	glView->setSelectedColor(color);
-	glView->updateGL();
+	glView->refreshFrames();
 }
 
 void MainWindow::onBlobFilterSmallSpinBoxValueChanged( int value )
 {
 	glView->record->trackingSettings.blobFilterSmall = value;
+	glView->refreshFrames();
 }
 
 void MainWindow::onBlobFilterLargeSpinBoxValueChanged( int value )
 {
 	glView->record->trackingSettings.blobFilterLarge = value;
+	glView->refreshFrames();
 }
 
 void MainWindow::onBlobDistanceFilterSliderChange( int value )
 {
 	glView->record->trackingSettings.blobDistanceFilter = value;
 	blobDistanceFilterSpinBox->setValue(value);
+	glView->refreshFrames();
 }
 
-void MainWindow::onBlobInactiveFilterSliderChange( int value )
+void MainWindow::onBlobInactiveFilterSpinBoxChange( int value )
 {
 	glView->record->trackingSettings.blobInactiveFilter = value;
-	blobInactiveFilterSpinBox->setValue(value);
+	glView->refreshFrames();
+}
+
+void MainWindow::onBlobActiveFilterSpinBoxChange( int value )
+{
+	glView->record->trackingSettings.blobActiveFilter = value;
+	glView->refreshFrames();
 }
 
 void MainWindow::onRightViewGroupTriggered(QAction * action)
@@ -216,6 +229,7 @@ void MainWindow::onRightViewGroupTriggered(QAction * action)
 	} else if (actionVideoRight->isChecked()) {
 		glView->setRightDisplay(Display::VIDEO);
 	}
+	glView->refreshFrames();
 }
 
 void MainWindow::onLeftViewGroupTriggered(QAction * action)
@@ -226,10 +240,13 @@ void MainWindow::onLeftViewGroupTriggered(QAction * action)
 		glView->setLeftDisplay(Display::BLOBS);
 	} else if (actionVideoLeft->isChecked()) {
 		glView->setLeftDisplay(Display::VIDEO);
-	}	
+	}
+	glView->refreshFrames();
 }
 
 void MainWindow::onComputeButtonClicked()
 {
+	statusbar->showMessage("Computing tracks");
 	glView->record->computeTracks();
+	statusbar->showMessage("Finished computing tracks");
 }

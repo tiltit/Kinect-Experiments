@@ -189,6 +189,9 @@ int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
 
 	IplImage *blobIpl = new IplImage(blobMat);
 	//CvBlobs blobs;
+
+	cvReleaseBlobs(f->blobs);
+
 	unsigned int result=cvLabel(blobIpl, labelImg, f->blobs);
 	cvFilterByArea(f->blobs, trackingSettings.blobFilterSmall, trackingSettings.blobFilterLarge);
 	blobMat = cvarrToMat(blobIpl, true);
@@ -202,6 +205,9 @@ int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
 	cout << endl;
 
 	blobs = f->blobs;
+
+	cvReleaseImage(&labelImg);
+	//cvReleaseImage(& blobIpl);
 	
 	return result;
 }
@@ -215,10 +221,41 @@ int KinectRecord::computeTracks()
 {
 	int i;
 	if(isOpen) {
+		cout << "Computing tracks" << endl;
+		CvTracks tracks;
 		for(vector<Frames*>::iterator it = frames.begin(); it != frames.end(); ++it) {
+			Mat blobMat;
+			blobMat = imread((*it)->depthFrame.fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+
+			uint16_t* depth = (uint16_t*)(blobMat.data);
+			for(int i=0;i!=640*480;++i) {
+				if( (depth[i] > trackingSettings.clipClose) && (depth[i] < trackingSettings.clipDistant)) {
+					depth[i] = 255;	// This is what is selected
+				} else {
+					depth[i] = 0; // This is not selected
+				}
+			}
+
+
+			blobMat.convertTo(blobMat, CV_8U);	// This function clips the most significant byte unless the scale ratio is specified in the third argument. 
+
+			IplImage *labelImg = cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
+
+			IplImage *blobIpl = new IplImage(blobMat);
+			//CvBlobs blobs;
+
+			cvReleaseBlobs((*it)->blobs);
+
+			unsigned int result=cvLabel(blobIpl, labelImg, (*it)->blobs);
+			cvFilterByArea((*it)->blobs, trackingSettings.blobFilterSmall, trackingSettings.blobFilterLarge);
+
+			cvReleaseImage(&labelImg);
+
+			cvUpdateTracks((*it)->blobs, tracks, (double)trackingSettings.blobDistanceFilter, trackingSettings.blobInactiveFilter, trackingSettings.blobActiveFilter);
 
 		}
-
+		cvReleaseTracks(tracks);
+		cout << "Finished computing tracks" << endl;
 		return 1;
 	} else {
 		return 0;

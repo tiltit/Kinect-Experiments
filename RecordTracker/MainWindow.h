@@ -33,7 +33,8 @@ class MainWindow : public QMainWindow, private Ui::UiMainWindow
 
 		void onBlobDistanceFilterSliderChange( int value );
 
-		void onBlobInactiveFilterSliderChange( int value );
+		void onBlobInactiveFilterSpinBoxChange( int value );
+		void onBlobActiveFilterSpinBoxChange( int value );
 
 		void onRightViewGroupTriggered( QAction * action);
 		void onLeftViewGroupTriggered( QAction * action);

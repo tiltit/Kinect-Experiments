@@ -32,6 +32,7 @@ class GlView : public QGLWidget
     void showFrame(int frameIndex);
     void showNextFrame();
     void showPreviousFrame();
+    void refreshFrames();
     void viewBlobs(bool visible);
 
     void setLeftDisplay(Display source);

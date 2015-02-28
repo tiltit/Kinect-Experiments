@@ -300,6 +300,14 @@ void GlView::showFrame(int frameIndex)
 	this->updateGL();
 }
 
+void GlView::refreshFrames()
+{
+	if( record->getIsOpen() && ((leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS)) ) {
+		retrieveImageData();
+	}
+	this->updateGL();
+}
+
 void GlView::showPreviousFrame()
 {
 	currentFrames = record->getPreviousFrames();

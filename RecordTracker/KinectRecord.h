@@ -11,6 +11,17 @@
 
 #include <cvblob.h>
 
+struct miniTrack {
+	uint16_t id;
+	uint16_t minx;
+    uint16_t maxx;
+    uint16_t miny;
+    uint16_t maxy;
+    uint16_t centroidX;
+    uint16_t centroidY;
+    uint16_t depth;
+};
+
 struct Frame
 {
 	char type;
@@ -24,7 +35,7 @@ struct Frames
 	Frame rgbFrame;
 	Frame depthFrame;
 	cvb::CvBlobs blobs;
-	cvb::CvTracks tracks;
+	std::vector<Frames*> frames;
 };
 
 struct TrackingSettings {
@@ -34,7 +45,10 @@ struct TrackingSettings {
 	uint16_t blobFilterLarge;
 	uint16_t blobDistanceFilter;
 	uint16_t blobInactiveFilter;
+	uint16_t blobActiveFilter;
 };
+
+
 
 class KinectRecord 
 {
