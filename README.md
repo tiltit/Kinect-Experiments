@@ -7,7 +7,7 @@ It consists of two applications, LiveTraker and RecordTraker. Their purpose is t
 Dependencies:
 
 * libfreenect
-* QT5 (Can work with QT4 but need to mess around a litle)
+* Qt4
 * OpenCV
 * CVBlob
 

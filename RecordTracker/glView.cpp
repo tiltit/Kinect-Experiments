@@ -120,13 +120,13 @@ void GlView::resizeGL(int w, int h)
 
 void GlView::retrieveImageData()
 {
-	if( (leftDisplay == Display::VIDEO) || (rightDisplay == Display::VIDEO)) {
+	if( (leftDisplayMode == DisplayMode::VIDEO) || (rightDisplayMode == DisplayMode::VIDEO)) {
 		record->getRgb(currentFrames, rgbMat);	
 	}
-	if( (leftDisplay == Display::DEPTH) || (rightDisplay == Display::DEPTH)) {
+	if( (leftDisplayMode == DisplayMode::DEPTH) || (rightDisplayMode == DisplayMode::DEPTH)) {
 		record->getDepth(currentFrames, depthMat);
 	}
-	if((leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS)) {
+	if((leftDisplayMode == DisplayMode::BLOBS) || (rightDisplayMode == DisplayMode::BLOBS)) {
 		record->getBlobs(currentFrames, blobMat, blobs);
 	}
 }
@@ -174,6 +174,8 @@ void GlView::drawTracks(int xOffset)
 		glVertex2f(miniTrack->centroidX-5 + xOffset, miniTrack->centroidY); 
 		glVertex2f(miniTrack->centroidX+5 + xOffset, miniTrack->centroidY); 
 		glEnd();
+		fontRender->setColor(QColor(255,0,255));
+		fontRender->print(miniTrack->minX + xOffset + 5, miniTrack->minY + 5, QString::number(miniTrack->id));
 
 	}
 	glEnable(GL_TEXTURE_2D);
@@ -183,7 +185,7 @@ void GlView::paintGL()
 {
 	if(record->getIsOpen()) {
 
-		if( (leftDisplay == Display::DEPTH) || (rightDisplay == Display::DEPTH)) {
+		if( (leftDisplayMode == DisplayMode::DEPTH) || (rightDisplayMode == DisplayMode::DEPTH)) {
 			uint16_t* depth = (uint16_t*)(depthMat.data);
 			for(int i=0;i!=640*480;++i) {
 				// if( (depth[i] > limitDepthMin) && (depth[i] < limitDepthMax)) {
@@ -203,7 +205,7 @@ void GlView::paintGL()
 			}
 		}
 
-		if( (leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS) ) {
+		if( (leftDisplayMode == DisplayMode::BLOBS) || (rightDisplayMode == DisplayMode::BLOBS) ) {
 			uint8_t* blobData = (uint8_t*)(blobMat.data);
 			for(int i=0;i!=640*480;++i) {
 				if( blobData[i] > 0 ) {
@@ -222,14 +224,14 @@ void GlView::paintGL()
 		glBindTexture(GL_TEXTURE_2D, glRgbTex);
 		
 		//glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
-		switch(leftDisplay) {
-			case Display::VIDEO:
+		switch(leftDisplayMode) {
+			case DisplayMode::VIDEO:
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
 				break;
-			case Display::DEPTH: 
+			case DisplayMode::DEPTH: 
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
 				break;
-			case Display::BLOBS: 
+			case DisplayMode::BLOBS: 
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, blobRgbMat.cols, blobRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, blobRgbMat.data);
 				break;
 		}
@@ -241,7 +243,7 @@ void GlView::paintGL()
 		glTexCoord2f(0, 1); glVertex3f(0,480,0);
 		glEnd();
 
-		if(leftDisplay == Display::BLOBS) {
+		if(leftDisplayMode == DisplayMode::BLOBS) {
 			drawBlobs(0);
 		}
 
@@ -251,14 +253,14 @@ void GlView::paintGL()
 
 		// Right View
 		glBindTexture(GL_TEXTURE_2D, glDepthTex);
-		switch(rightDisplay) {
-			case Display::VIDEO:
+		switch(rightDisplayMode) {
+			case DisplayMode::VIDEO:
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, rgbMat.cols, rgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, rgbMat.data);
 				break;
-			case Display::DEPTH: 
+			case DisplayMode::DEPTH: 
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, depthRgbMat.cols, depthRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, depthRgbMat.data);
 				break;
-			case Display::BLOBS: 
+			case DisplayMode::BLOBS: 
 				glTexImage2D(GL_TEXTURE_2D, 0, 3, blobRgbMat.cols, blobRgbMat.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, blobRgbMat.data);
 				break;
 		}
@@ -271,7 +273,7 @@ void GlView::paintGL()
 		glTexCoord2f(0, 1); glVertex3f(640,480,0);
 		glEnd();
 
-		if(rightDisplay == Display::BLOBS) {
+		if(rightDisplayMode == DisplayMode::BLOBS) {
 			drawBlobs(640);
 		}
 
@@ -336,7 +338,7 @@ void GlView::showFrame(int frameIndex)
 
 void GlView::refreshFrames()
 {
-	if( record->getIsOpen() && ((leftDisplay == Display::BLOBS) || (rightDisplay == Display::BLOBS)) ) {
+	if( record->getIsOpen() && ((leftDisplayMode == DisplayMode::BLOBS) || (rightDisplayMode == DisplayMode::BLOBS)) ) {
 		retrieveImageData();
 	}
 	this->updateGL();
@@ -356,14 +358,14 @@ void GlView::showNextFrame()
 	this->updateGL();
 }
 
-void GlView::setLeftDisplay(Display source)
+void GlView::setLeftDisplayMode(DisplayMode source)
 {
-	leftDisplay = source;
+	leftDisplayMode = source;
 }
 
-void GlView::setRightDisplay(Display source)
+void GlView::setRightDisplayMode(DisplayMode source)
 {
-	rightDisplay = source;
+	rightDisplayMode = source;
 }
 
 void GlView::setTracksVisibleLeft(bool visible)

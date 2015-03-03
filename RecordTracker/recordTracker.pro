@@ -1,4 +1,4 @@
-CONFIG += qt debug
+CONFIG += qt debug_and_release
 
 QMAKE_CXXFLAGS += -std=c++11
 

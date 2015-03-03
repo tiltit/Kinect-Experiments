@@ -16,7 +16,7 @@
 #include "KinectRecord.h"
 
 
-enum class Display { VIDEO, DEPTH, BLOBS };
+enum class DisplayMode { VIDEO, DEPTH, BLOBS };
 
 class GlView : public QGLWidget
  {
@@ -35,8 +35,8 @@ class GlView : public QGLWidget
     void refreshFrames();
     void viewBlobs(bool visible);
 
-    void setLeftDisplay(Display source);
-    void setRightDisplay(Display source);
+    void setLeftDisplayMode(DisplayMode source);
+    void setRightDisplayMode(DisplayMode source);
     void setTracksVisibleLeft(bool visible);
     void setTracksVisibleRight(bool visible);
 
@@ -72,8 +72,8 @@ private:
     FontRender *fontRender;
     Frames *currentFrames;
     bool blobsVisible;
-    Display leftDisplay;
-    Display rightDisplay;
+    DisplayMode leftDisplayMode;
+    DisplayMode rightDisplayMode;
     bool tracksVisibleLeft;
     bool tracksVisibleRight;
 
