@@ -37,7 +37,8 @@ class GlView : public QGLWidget
 
     void setLeftDisplay(Display source);
     void setRightDisplay(Display source);
-
+    void setTracksVisibleLeft(bool visible);
+    void setTracksVisibleRight(bool visible);
 
     KinectRecord *record;
 
@@ -46,6 +47,7 @@ class GlView : public QGLWidget
     void initializeGL();
     void resizeGL(int w, int h);
     void drawBlobs(int xOffset);
+    void drawTracks(int xOffset);
     void paintGL();
     //void mousePressEvent(QMouseEvent *event);
     //void mouseMoveEvent(QMouseEvent *event);
@@ -72,6 +74,8 @@ private:
     bool blobsVisible;
     Display leftDisplay;
     Display rightDisplay;
+    bool tracksVisibleLeft;
+    bool tracksVisibleRight;
 
 
 private slots:

@@ -33,6 +33,8 @@ GlView::GlView(QWidget *parent)
 	labelImg=cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
 
 	blobsVisible = false;
+	tracksVisibleLeft = false;
+	tracksVisibleRight = false;
 }
 
 void GlView::viewBlobs(bool visible) 
@@ -63,7 +65,8 @@ void GlView::computeHue() {
 	QColor color(255,255,255);
 
 	for(i=1;i!=0xFFFF;++i) {
-		hue = (1.0 / 0xFFFF) * i;
+		//hue = (1.0 / (double)0xFFFF) * i;
+		hue = 1.0 / 512 * (i%512);
 		color.setHsvF(hue, 1.0, 1.0);
 
 		hsvLookup[i][0] = color.blue();
@@ -153,6 +156,29 @@ void GlView::drawBlobs(int xOffset)
 	glEnable(GL_TEXTURE_2D);
 }
 
+void GlView::drawTracks(int xOffset)
+{
+	glDisable(GL_TEXTURE_2D);
+	//glDisable(GL_TEXTURE_2D);
+	for(std::map<int, MiniTrack*>::iterator it=currentFrames->miniTracks.begin(); it!=currentFrames->miniTracks.end();++it) {
+		MiniTrack *miniTrack = (*it).second;
+		
+		//qDebug() << miniTrack->centroidX;
+		glLineWidth(2);
+		glColor3f(1.0, 0, 1.0);
+		glBegin(GL_LINE_STRIP);
+		glVertex2f(miniTrack->centroidX + xOffset, miniTrack->centroidY - 5); 
+		glVertex2f(miniTrack->centroidX + xOffset, miniTrack->centroidY + 5); 
+		glEnd();
+		glBegin(GL_LINE_STRIP);
+		glVertex2f(miniTrack->centroidX-5 + xOffset, miniTrack->centroidY); 
+		glVertex2f(miniTrack->centroidX+5 + xOffset, miniTrack->centroidY); 
+		glEnd();
+
+	}
+	glEnable(GL_TEXTURE_2D);
+}
+
 void GlView::paintGL() 
 {
 	if(record->getIsOpen()) {
@@ -219,6 +245,10 @@ void GlView::paintGL()
 			drawBlobs(0);
 		}
 
+		if(tracksVisibleLeft) {
+			drawTracks(0);
+		}
+
 		// Right View
 		glBindTexture(GL_TEXTURE_2D, glDepthTex);
 		switch(rightDisplay) {
@@ -243,6 +273,10 @@ void GlView::paintGL()
 
 		if(rightDisplay == Display::BLOBS) {
 			drawBlobs(640);
+		}
+
+		if(tracksVisibleLeft) {
+			drawTracks(640);
 		}
 
 	}
@@ -330,4 +364,14 @@ void GlView::setLeftDisplay(Display source)
 void GlView::setRightDisplay(Display source)
 {
 	rightDisplay = source;
+}
+
+void GlView::setTracksVisibleLeft(bool visible)
+{
+	tracksVisibleLeft = visible;
+}
+
+void GlView::setTracksVisibleRight(bool visible)
+{
+	tracksVisibleRight = visible;
 }

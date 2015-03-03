@@ -40,6 +40,9 @@ MainWindow::MainWindow(QMainWindow *parent)
 
 	connect(computeButton, SIGNAL(clicked()), this, SLOT(onComputeButtonClicked()));
 
+	connect(actionTracksLeft, SIGNAL(triggered()), this, SLOT(actionTracksLeftTriggered()));
+	connect(actionTracksRight, SIGNAL(triggered()), this, SLOT(actionTracksRightTriggered()));
+
 	rightViewGroup = new QActionGroup(this);
 	rightViewGroup->addAction(actionDepthRight);
 	rightViewGroup->addAction(actionBlobsRight);
@@ -249,4 +252,16 @@ void MainWindow::onComputeButtonClicked()
 	statusbar->showMessage("Computing tracks");
 	glView->record->computeTracks();
 	statusbar->showMessage("Finished computing tracks");
+	actionTracksLeft->setEnabled(true);
+	actionTracksRight->setEnabled(true);
+}
+
+void MainWindow::actionTracksLeftTriggered()
+{
+	glView->setTracksVisibleLeft(actionTracksLeft->isChecked());
+}
+
+void MainWindow::actionTracksRightTriggered()
+{
+	glView->setTracksVisibleRight(actionTracksLeft->isChecked());
 }

@@ -13,12 +13,12 @@
 
 struct MiniTrack {
 	uint16_t id;
-	uint16_t minx;
-	uint16_t maxx;
-	uint16_t miny;
-	uint16_t maxy;
-	uint16_t centroidX;
-	uint16_t centroidY;
+	uint16_t minX;
+	uint16_t maxX;
+	uint16_t minY;
+	uint16_t maxY;
+	double centroidX;
+	double centroidY;
 	uint16_t depth;
 };
 
@@ -35,7 +35,7 @@ struct Frames
 	Frame rgbFrame;
 	Frame depthFrame;
 	cvb::CvBlobs blobs;
-	std::map<MiniTrack*> miniTracks;
+	std::map<int, MiniTrack*> miniTracks;
 };
 
 struct TrackingSettings {
@@ -65,12 +65,15 @@ public:
 	int getDepth(Frames *f, cv::Mat& output);
 	int getRgb(Frames *f, cv::Mat& output);
 	int getBlobs(Frames *f, cv::Mat& output, cvb::CvBlobs& blobs);
+	std::map<int, MiniTrack*> getTracks(Frames *f);
 	bool getIsOpen();
 	int computeTracks();
 
 	struct TrackingSettings trackingSettings;
 
 protected:
+	void releaseMinitracks(std::map<int, MiniTrack*> &miniTracks);
+	int loadPGM16BitBigEndian(std::string filename, cv::Mat& output);
 	int currentFrame;
 	int nbrOfFrames;
 	std::vector<Frames*> frames;

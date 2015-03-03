@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <sys/stat.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -212,47 +213,88 @@ int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
 	return result;
 }
 
+map<int, MiniTrack*> KinectRecord::getTracks(Frames *f)
+{
+
+}
+
 bool KinectRecord::getIsOpen()
 {
 	return isOpen;
 }
 
+void KinectRecord::releaseMinitracks(map<int, MiniTrack*> &miniTracks)
+{
+	for (map<int, MiniTrack*>::iterator it=miniTracks.begin(); it!=miniTracks.end(); it++) {
+		MiniTrack *miniTrack;
+		miniTrack = (*it).second;
+		delete miniTrack;
+	}
+	miniTracks.clear();
+}
+
 int KinectRecord::computeTracks()
 {
-	int i;
 	if(isOpen) {
 		cout << "Computing tracks" << endl;
 		CvTracks tracks;
+		MiniTrack *miniTrack;
 		for(vector<Frames*>::iterator it = frames.begin(); it != frames.end(); ++it) {
-			Mat blobMat;
+			Mat blobMat, blobMat8;
+
 			blobMat = imread((*it)->depthFrame.fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+			blobMat8 = Mat::zeros( Size(640,480), CV_8UC1 );
 
 			uint16_t* depth = (uint16_t*)(blobMat.data);
+			uint8_t* depth8 = (uint8_t*)(blobMat8.data);
+
 			for(int i=0;i!=640*480;++i) {
 				if( (depth[i] > trackingSettings.clipClose) && (depth[i] < trackingSettings.clipDistant)) {
-					depth[i] = 255;	// This is what is selected
+					depth8[i] = 255;	// This is what is selected
 				} else {
-					depth[i] = 0; // This is not selected
+					depth8[i] = 0; // This is not selected
 				}
 			}
 
-
-			blobMat.convertTo(blobMat, CV_8U);	// This function clips the most significant byte unless the scale ratio is specified in the third argument. 
-
 			IplImage *labelImg = cvCreateImage(cvSize(640, 480), IPL_DEPTH_LABEL, 1);
 
-			IplImage *blobIpl = new IplImage(blobMat);
-			//CvBlobs blobs;
+			IplImage *blobIpl = new IplImage(blobMat8);
 
 			cvReleaseBlobs((*it)->blobs);
 
 			unsigned int result=cvLabel(blobIpl, labelImg, (*it)->blobs);
+			if(result) 
+				cout << "cvLabel result:\t" << result << endl;
+
 			cvFilterByArea((*it)->blobs, trackingSettings.blobFilterSmall, trackingSettings.blobFilterLarge);
 
 			cvReleaseImage(&labelImg);
 
 			cvUpdateTracks((*it)->blobs, tracks, (double)trackingSettings.blobDistanceFilter, trackingSettings.blobInactiveFilter, trackingSettings.blobActiveFilter);
 
+			if((*it)->miniTracks.size() > 0) {
+				releaseMinitracks((*it)->miniTracks);
+			}
+
+			for (CvTracks::iterator trackIt=tracks.begin(); trackIt!=tracks.end(); trackIt++)
+			{
+				CvTrack *track = (*trackIt).second;
+				miniTrack = new MiniTrack;
+				
+				miniTrack->id = track->label;
+
+				miniTrack->minX = track->minx;
+				miniTrack->minY = track->miny;
+				miniTrack->maxX = track->maxx;
+				miniTrack->maxY = track->maxy;
+
+				miniTrack->centroidX = track->centroid.x;
+				miniTrack->centroidY = track->centroid.y;
+
+				miniTrack->depth = depth[((int)track->centroid.y * 640) + (int)track->centroid.x];
+
+				(*it)->miniTracks[track->label] = miniTrack;
+			}
 		}
 		cvReleaseTracks(tracks);
 		cout << "Finished computing tracks" << endl;
