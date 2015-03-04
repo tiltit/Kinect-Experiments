@@ -158,14 +158,16 @@ void GlView::drawBlobs(int xOffset)
 
 void GlView::drawTracks(int xOffset)
 {
+	QColor *color;
 	glDisable(GL_TEXTURE_2D);
 	//glDisable(GL_TEXTURE_2D);
 	for(std::map<int, MiniTrack*>::iterator it=currentFrames->miniTracks.begin(); it!=currentFrames->miniTracks.end();++it) {
 		MiniTrack *miniTrack = (*it).second;
 		
 		//qDebug() << miniTrack->centroidX;
+		color = colorVector->at(miniTrack->id % 100);
 		glLineWidth(2);
-		glColor3f(1.0, 0, 1.0);
+		glColor3f(color->redF(), color->greenF(), color->blueF());
 		glBegin(GL_LINE_STRIP);
 		glVertex2f(miniTrack->centroidX + xOffset, miniTrack->centroidY - 5); 
 		glVertex2f(miniTrack->centroidX + xOffset, miniTrack->centroidY + 5); 
@@ -277,7 +279,7 @@ void GlView::paintGL()
 			drawBlobs(640);
 		}
 
-		if(tracksVisibleLeft) {
+		if(tracksVisibleRight) {
 			drawTracks(640);
 		}
 

@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 			header.append(1,buff[i]);
 		} 
 		while( (buff[++i] != '\n') || (i>=size-1) );
-		cout << header << endl;
+		
 
 		vector<string> headerFields = split(header, ' ');
 
@@ -66,9 +66,11 @@ int main(int argc, char *argv[])
 			buff[++i] = tmp;
 		} while ( i+1 < size );
 
-		ofstream myFile (argv[1], ios::out | ios::binary);
-    	myFile.write (buff, size);
+		ofstream pgmOut (argv[1], ios::out | ios::binary);
+		pgmOut.write (buff, size);
+		pgmOut.close();
 
+		cout << "Done converting: "  << argv[1] << endl;
 
   	}
 	return 0;

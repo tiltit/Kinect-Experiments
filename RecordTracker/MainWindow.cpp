@@ -259,9 +259,11 @@ void MainWindow::onComputeButtonClicked()
 void MainWindow::actionTracksLeftTriggered()
 {
 	glView->setTracksVisibleLeft(actionTracksLeft->isChecked());
+	glView->refreshFrames();
 }
 
 void MainWindow::actionTracksRightTriggered()
 {
 	glView->setTracksVisibleRight(actionTracksLeft->isChecked());
+	glView->refreshFrames();
 }
