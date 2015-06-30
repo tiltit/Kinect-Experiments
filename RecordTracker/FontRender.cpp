@@ -1,3 +1,6 @@
+/**
+ *	Reders fonts created with font builder
+ **/
 #include <iostream>
 #include <QDebug>
 #include <QDomDocument>

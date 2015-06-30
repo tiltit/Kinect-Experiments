@@ -14,3 +14,7 @@ Dependencies:
 
 I am also using a widget from here:
 http://qt-project.org/forums/viewthread/19757
+
+
+The bitmap font has been generated with the help of "fontbuilder":
+https://github.com/andryblack/fontbuilder

@@ -62,7 +62,6 @@ private:
     cv::Mat depthRgbMat;
     cv::Mat blobMat;
     cv::Mat blobRgbMat;
-    cvb::CvBlobs blobs;
     GLuint glDepthTex;
     GLuint glRgbTex;
     QColor selectedColor;

@@ -127,7 +127,7 @@ void GlView::retrieveImageData()
 		record->getDepth(currentFrames, depthMat);
 	}
 	if((leftDisplayMode == DisplayMode::BLOBS) || (rightDisplayMode == DisplayMode::BLOBS)) {
-		record->getBlobs(currentFrames, blobMat, blobs);
+		record->getBlobs(currentFrames, blobMat);
 	}
 }
 
@@ -135,7 +135,7 @@ void GlView::drawBlobs(int xOffset)
 {
 	glDisable(GL_TEXTURE_2D);
 
-	for(CvBlobs::iterator it=blobs.begin(); it!=blobs.end(); ++it) {
+	for(CvBlobs::iterator it=currentFrames->blobs.begin(); it!=currentFrames->blobs.end(); ++it) {
 		CvBlob *blob = (*it).second;
 		glLineWidth(2);
 		glColor3f(1.0, 1.0, 1.0);

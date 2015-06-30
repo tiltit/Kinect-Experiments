@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow, private Ui::UiMainWindow
 
 		void actionTracksLeftTriggered();
 		void actionTracksRightTriggered();
+		void actionExportTracksTriggered();
 }; 
 
 #endif

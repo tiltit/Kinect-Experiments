@@ -1,6 +1,7 @@
 #include <fstream>
-#include <sstream>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
@@ -167,7 +168,7 @@ int KinectRecord::getRgb(Frames *f, Mat& output)
     return 1;
 }
 
-int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
+int KinectRecord::getBlobs( Frames *f, Mat& output )
 {
 	Mat blobMat;
 	blobMat = imread(f->depthFrame.fileName.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
@@ -204,8 +205,6 @@ int KinectRecord::getBlobs(Frames *f, Mat& output, CvBlobs& blobs)
 		cout << "Blob #" << it->second->label << ": Area=" << it->second->area << endl;
 	}
 	cout << endl;
-
-	blobs = f->blobs;
 
 	cvReleaseImage(&labelImg);
 	//cvReleaseImage(& blobIpl);
@@ -271,6 +270,7 @@ int KinectRecord::computeTracks()
 			cvReleaseImage(&labelImg);
 
 			cvUpdateTracks((*it)->blobs, tracks, (double)trackingSettings.blobDistanceFilter, trackingSettings.blobInactiveFilter, trackingSettings.blobActiveFilter);
+			//cvUpdateTracks((*it)->blobs, tracks, (double)trackingSettings.blobDistanceFilter, trackingSettings.blobInactiveFilter);
 
 			if((*it)->miniTracks.size() > 0) {
 				releaseMinitracks((*it)->miniTracks);
@@ -281,7 +281,7 @@ int KinectRecord::computeTracks()
 				CvTrack *track = (*trackIt).second;
 				miniTrack = new MiniTrack;
 				
-				miniTrack->id = track->label;
+				miniTrack->id = track->id;
 
 				miniTrack->minX = track->minx;
 				miniTrack->minY = track->miny;
@@ -302,4 +302,39 @@ int KinectRecord::computeTracks()
 	} else {
 		return 0;
 	}
+}
+
+vector<string> KinectRecord::exportTracksToXml()
+{
+	stringstream ss;
+	vector<string> ret;
+	ss << "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+	cout << ss << endl;
+	ret.push_back(ss.str());
+	ss.str(std::string());
+	ss.clear();
+	for(vector<Frames*>::iterator it = frames.begin(); it != frames.end(); ++it) {
+		if((*it)->miniTracks.size() > 0) {	
+			//cout << "<Frame currenttime=\"" << (*it)->depthFrame.currenttime << "\">" << endl;
+			ss << "<Frame currenttime=\"" << setprecision(16) << (*it)->depthFrame.currenttime << "\">";
+			cout << ss.str() << endl;
+			ret.push_back(ss.str());
+			ss.str(std::string());
+			ss.clear();
+			for(std::map<int, MiniTrack*>::iterator it_track=(*it)->miniTracks.begin(); it_track!=(*it)->miniTracks.end();++it_track) {
+				MiniTrack *miniTrack = (*it_track).second;
+				ss << setprecision(16) << "\t<Track id=\"" << miniTrack->id << "\" X=\"" << miniTrack->centroidX << "\" Y=\"" << miniTrack->centroidY << "\" Z=\"" << miniTrack->depth << "\" />";
+				cout << ss.str() << endl;
+				ret.push_back(ss.str());
+				ss.str(std::string());
+				ss.clear();
+			}
+			ss << "</Frame>";
+			cout << ss.str() << endl;
+			ret.push_back(ss.str());
+			ss.str(std::string());
+			ss.clear();
+		}
+	}
+	return ret;
 }

@@ -301,7 +301,7 @@
              </size>
             </property>
             <property name="maximum">
-             <number>500</number>
+             <number>10000</number>
             </property>
             <property name="value">
              <number>5</number>
@@ -471,6 +471,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen_Folder"/>
+    <addaction name="actionExportTracks"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -573,6 +574,14 @@
    </property>
    <property name="text">
     <string>Video</string>
+   </property>
+  </action>
+  <action name="actionExportTracks">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Export Tracks</string>
    </property>
   </action>
  </widget>

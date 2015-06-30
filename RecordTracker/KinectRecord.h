@@ -64,10 +64,11 @@ public:
 	int getNumberOfFrames(void);
 	int getDepth(Frames *f, cv::Mat& output);
 	int getRgb(Frames *f, cv::Mat& output);
-	int getBlobs(Frames *f, cv::Mat& output, cvb::CvBlobs& blobs);
+	int getBlobs( Frames *f, cv::Mat& output );
 	std::map<int, MiniTrack*> getTracks(Frames *f);
 	bool getIsOpen();
 	int computeTracks();
+	std::vector<std::string> exportTracksToXml();
 
 	struct TrackingSettings trackingSettings;
 

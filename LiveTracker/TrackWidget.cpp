@@ -170,7 +170,7 @@ void TrackWidget::paintGL()
  		glVertex2f(track->minx, track->miny);
  		glEnd();
  		fontRender->setColor(QColor(255,255,0));
- 		fontRender->print(track->minx + 5, track->miny + 5, QString::number(track->label));
+ 		fontRender->print(track->minx + 5, track->miny + 5, QString::number(track->id));
     }
     glEnable(GL_TEXTURE_2D); 
 

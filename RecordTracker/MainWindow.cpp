@@ -42,6 +42,7 @@ MainWindow::MainWindow(QMainWindow *parent)
 
 	connect(actionTracksLeft, SIGNAL(triggered()), this, SLOT(actionTracksLeftTriggered()));
 	connect(actionTracksRight, SIGNAL(triggered()), this, SLOT(actionTracksRightTriggered()));
+	connect(actionExportTracks, SIGNAL(triggered()), this, SLOT(actionExportTracksTriggered()));
 
 	rightViewGroup = new QActionGroup(this);
 	rightViewGroup->addAction(actionDepthRight);
@@ -254,6 +255,7 @@ void MainWindow::onComputeButtonClicked()
 	statusbar->showMessage("Finished computing tracks");
 	actionTracksLeft->setEnabled(true);
 	actionTracksRight->setEnabled(true);
+	actionExportTracks->setEnabled(true);
 }
 
 void MainWindow::actionTracksLeftTriggered()
@@ -264,6 +266,18 @@ void MainWindow::actionTracksLeftTriggered()
 
 void MainWindow::actionTracksRightTriggered()
 {
-	glView->setTracksVisibleRight(actionTracksLeft->isChecked());
+	glView->setTracksVisibleRight(actionTracksRight->isChecked());
 	glView->refreshFrames();
+}
+
+void MainWindow::actionExportTracksTriggered()
+{
+	std::vector<std::string> v = glView->record->exportTracksToXml();
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Xml (*.xml)"));
+
+	if (fileName != "") {
+		
+	}
+
 }
