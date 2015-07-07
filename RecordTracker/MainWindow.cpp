@@ -134,8 +134,12 @@ void MainWindow::actionOpenFolderTriggered()
 
 	QFileDialog *dialog = new QFileDialog();
 	//dialog->setFileMode(QFileDialog::ExistingFile);
-	dialog->setNameFilter("RECORD TXT Files (*.txt)");
+
+	//dialog->setNameFilter("RECORD TXT Files (*.txt)");
+	dialog->setFileMode(QFileDialog::Directory);
 	dialog->setOption(QFileDialog::ReadOnly);
+	dialog->setOption(QFileDialog::ShowDirsOnly);
+	dialog->setOption(QFileDialog::DontResolveSymlinks);
 	//dialog->setOption(QFileDialog::DontUseNativeDialog);
 
 	QSettings settings("foobar","kinect-record-tracker");
@@ -147,21 +151,26 @@ void MainWindow::actionOpenFolderTriggered()
 	QStringList fileNames;
 	if (dialog->exec()) {
 		fileNames = dialog->selectedFiles();
-		QString fileName = fileNames.at(0);
+		// QString fileName = fileNames.at(0);
 		
-		QFileInfo fileInfo(fileName);
-		path = fileInfo.absoluteDir().path();
+		//QFileInfo fileInfo(fileName);
+		//path = fileInfo.absoluteDir().path();
+		path = fileNames.at(0);
+		QString fileName = path + "/" + "INDEX.txt";
 
 		settings.setValue("loadpath", path);
 		
-		glView->openRecord(fileName);
-		qDebug() << "File Opened";
-
-		frameNumberSpinBox->setEnabled(true);
-		frameNumberSpinBox->setMaximum(glView->getRecordLength());
-		frameSlider->setEnabled(true);
-		frameSlider->setMaximum(glView->getRecordLength());
-		computeButton->setEnabled(true);
+		qDebug() << "Opening:\t" << fileName;
+		if(glView->openRecord(fileName)) {
+			qDebug() << "File:\t" << fileName << " opened";
+			frameNumberSpinBox->setEnabled(true);
+			frameNumberSpinBox->setMaximum(glView->getRecordLength());
+			frameSlider->setEnabled(true);
+			frameSlider->setMaximum(glView->getRecordLength());
+			computeButton->setEnabled(true);
+		} else {
+			qDebug() << "Failed to open:\t" << fileName;
+		}
 	}
 }
 
