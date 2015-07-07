@@ -161,7 +161,7 @@ void MainWindow::actionOpenFolderTriggered()
 		settings.setValue("loadpath", path);
 		
 		qDebug() << "Opening:\t" << fileName;
-		if(glView->openRecord(fileName)) {
+		if(glView->openRecord(fileName) == 0) {
 			qDebug() << "File:\t" << fileName << " opened";
 			frameNumberSpinBox->setEnabled(true);
 			frameNumberSpinBox->setMaximum(glView->getRecordLength());
