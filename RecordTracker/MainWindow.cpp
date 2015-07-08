@@ -157,8 +157,8 @@ void MainWindow::actionOpenFolderTriggered()
 		//path = fileInfo.absoluteDir().path();
 		path = fileNames.at(0);
 		QString fileName = path + "/" + "INDEX.txt";
-
-		settings.setValue("loadpath", path);
+		
+		settings.setValue("loadpath", path.left(path.lastIndexOf("/")));
 		
 		qDebug() << "Opening:\t" << fileName;
 		if(glView->openRecord(fileName) == 0) {
@@ -185,12 +185,14 @@ void MainWindow::onFrameSliderChange( int value )
 
 void MainWindow::onDepthMinSliderChange( int value )
 {
+	distanceCloseLabel->setText("Distance in meters: " + QString::number(KinectRecord::convertToMeters(value)));
 	glView->record->trackingSettings.clipClose = value;
 	glView->refreshFrames();
 }
 
 void MainWindow::onDepthMaxSliderChange( int value )
 {
+	distanceDistantLabel->setText("Distance in meters: " + QString::number(KinectRecord::convertToMeters(value)));
 	glView->record->trackingSettings.clipDistant = value;
 	glView->refreshFrames();
 

@@ -82,6 +82,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="distanceCloseLabel">
+              <property name="text">
+               <string>Distance in meters:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -99,7 +106,7 @@
           <item>
            <widget class="QSlider" name="depthMinSlider">
             <property name="maximum">
-             <number>65535</number>
+             <number>2047</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -144,6 +151,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QLabel" name="distanceDistantLabel">
+              <property name="text">
+               <string>Distance in meters:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <spacer name="horizontalSpacer_2">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -161,7 +175,7 @@
           <item>
            <widget class="QSlider" name="depthMaxSlider">
             <property name="maximum">
-             <number>65535</number>
+             <number>2047</number>
             </property>
             <property name="sliderPosition">
              <number>0</number>

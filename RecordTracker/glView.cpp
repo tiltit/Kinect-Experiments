@@ -64,9 +64,10 @@ void GlView::computeHue() {
 	double hue;
 	QColor color(255,255,255);
 
-	for(i=1;i!=0xFFFF;++i) {
-		//hue = (1.0 / (double)0xFFFF) * i;
-		hue = 1.0 / 512 * (i%512);
+	for(i=1;i!=1022;++i) {
+
+		//hue = 1.0 / 512 * (i%512);
+		hue = 1.0 / 5 * (KinectRecord::convertToMeters(i));
 		color.setHsvF(hue, 1.0, 1.0);
 
 		hsvLookup[i][0] = color.blue();
@@ -199,10 +200,15 @@ void GlView::paintGL()
 				 	//blobMat.data[i]=255;
 				} else {
 					// This is what is cliped
+
+					// depthRgbMat.data[i*3] = depth[i] >> 3;
+					// depthRgbMat.data[i*3+1] = depth[i] >> 3;
+					// depthRgbMat.data[i*3+2] = depth[i] >> 3;
+
 					depthRgbMat.data[i*3] = hsvLookup[depth[i]][0];
 					depthRgbMat.data[i*3+1] = hsvLookup[depth[i]][1];
 					depthRgbMat.data[i*3+2] = hsvLookup[depth[i]][2];
-					//blobMat.data[i]=0;
+
 				}
 			}
 		}

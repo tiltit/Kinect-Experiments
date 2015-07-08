@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
+#include <math.h>
 
 #include "KinectRecord.h"
 #include "split.h"
@@ -13,6 +14,17 @@ using namespace std;
 using namespace cv;
 using namespace cvb;
 
+inline bool fileExists (const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
+}
+
+// Convert Kinect data to meters, see:
+// http://openkinect.org/wiki/Imaging_Information
+float KinectRecord::convertToMeters(uint16_t rawData)
+{
+	return 0.1236 * tanf( (float)rawData / 2842.5 + 1.1863);
+}
 
 KinectRecord::KinectRecord()
 {
@@ -44,6 +56,8 @@ int KinectRecord::open(string fileName)
 
 	ifstream recordFile(fileName.c_str());
 
+	int cnt = 0;
+
 	if(!recordFile)
     {
         std::cout<<"Error opening output file"<< std::endl;
@@ -60,7 +74,7 @@ int KinectRecord::open(string fileName)
     frames.clear();
 
     vector<string> frameInfo;
-
+    
     for(vector<string>::iterator it = txtData.begin();it != txtData.end(); ++it) {
 
     	frameInfo = split(*it, '-');
@@ -82,23 +96,32 @@ int KinectRecord::open(string fileName)
     	timestamp.erase(timestamp.find('.'), timestamp.size() - 1);
 		frame->timestamp = boost::lexical_cast<unsigned long>(timestamp);
 		frame->fileName = recordDirectory + '/' + *it;
-
-		cout << "Frame:" << frame->type << " " << frame->currenttime << " " << frame->fileName  << endl;
+		
+		
+		//cout << "Frame:" << frame->type << " " << frame->currenttime << " " << frame->fileName  << endl;
 		switch(frame->type) {
 			case 'r' :	rgbFrames.push_back(frame);break;
 			case 'd' :	depthFrames.push_back(frame);break;
 			default: break;
 		}
+		
     }
 
     cout << "RGB Frames:" << '\t' << rgbFrames.size() << endl;
     cout << "Depth Frames:" << '\t' << depthFrames.size() << endl;
 
 	for(vector<Frame*>::iterator it = depthFrames.begin(); it != depthFrames.end(); ++it) {
-		Frames *f = new Frames;
-		f->depthFrame = **it;
-		f->rgbFrame = getRgbFrameFromCurrenttime((*it)->currenttime, rgbFrames);
-		frames.push_back(f);
+		
+		if(fileExists((*it)->fileName)) {
+			Frames *f = new Frames;
+			f->depthFrame = **it;
+			f->rgbFrame = getRgbFrameFromCurrenttime((*it)->currenttime, rgbFrames);
+			frames.push_back(f);
+
+			cout << "Frame nr:\t" << cnt++ << endl;
+			cout << "Depth:\t" << f->depthFrame.fileName << endl;
+			cout << "Rgb:\t" << f->rgbFrame.fileName << endl;
+		}
 	}
 
 	// Small test

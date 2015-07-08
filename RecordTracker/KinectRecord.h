@@ -69,6 +69,7 @@ public:
 	bool getIsOpen();
 	int computeTracks();
 	std::vector<std::string> exportTracksToXml();
+	static float convertToMeters(uint16_t rawData);
 
 	struct TrackingSettings trackingSettings;
 
