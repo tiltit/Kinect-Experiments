@@ -72,7 +72,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::loadSettings()
 {
 	QString setting;
-	QSettings settings("foobar","kinect-record-tracker");
+	QSettings settings(QApplication::applicationDirPath() + "/settings.ini",QSettings::NativeFormat);
 
 	setting = settings.value("clipClose").toString();
 	glView->record->trackingSettings.clipClose = (setting != "") ? setting.toInt() : 0;
@@ -113,8 +113,8 @@ void MainWindow::loadSettings()
 void MainWindow::saveSettings()
 {
 	QString setting;
-	QSettings settings("foobar","kinect-record-tracker");
-
+	QSettings settings(QApplication::applicationDirPath() + "/settings.ini",QSettings::NativeFormat);
+	
 	settings.setValue("clipClose", QString::number(glView->record->trackingSettings.clipClose));
 	settings.setValue("clipDistant", QString::number(glView->record->trackingSettings.clipDistant));
 	settings.setValue("blobFilterSmall", QString::number(glView->record->trackingSettings.blobFilterSmall));
@@ -142,7 +142,8 @@ void MainWindow::actionOpenFolderTriggered()
 	dialog->setOption(QFileDialog::DontResolveSymlinks);
 	//dialog->setOption(QFileDialog::DontUseNativeDialog);
 
-	QSettings settings("foobar","kinect-record-tracker");
+	QSettings settings(QApplication::applicationDirPath() + "/settings.ini",QSettings::NativeFormat);
+
 	path = settings.value("loadpath").toString ();
 	if(path != "") {
 		dialog->setDirectory(path);
@@ -157,7 +158,7 @@ void MainWindow::actionOpenFolderTriggered()
 		//path = fileInfo.absoluteDir().path();
 		path = fileNames.at(0);
 		QString fileName = path + "/" + "INDEX.txt";
-		
+
 		settings.setValue("loadpath", path.left(path.lastIndexOf("/")));
 		
 		qDebug() << "Opening:\t" << fileName;

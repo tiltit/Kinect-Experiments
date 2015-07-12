@@ -80,29 +80,30 @@ int KinectRecord::open(string fileName)
     	frameInfo = split(*it, '-');
     	if (frameInfo.size() != 3) {
     		// Some very basic error checking
-    		cout << "Corrupt file" << endl;
-    		return -1;
-    	}
+    		cout << "Corrupt entry" << endl;
+    		// return -1;
+    	} else {
 
-    	if(frameInfo[0][0] == 'a')
-    		continue;	// Don't care mutch for the accelerometer data
+	    	if(frameInfo[0][0] == 'a')
+				continue;	// Don't care mutch for the accelerometer data
 
-    	Frame *frame = new Frame;
+			Frame *frame = new Frame;
 
-    	frame->type = frameInfo[0][0];
-    	frame->currenttime = boost::lexical_cast<double>(frameInfo[1]);
+			frame->type = frameInfo[0][0];
+			frame->currenttime = boost::lexical_cast<double>(frameInfo[1]);
 
-    	string timestamp = frameInfo[2];
-    	timestamp.erase(timestamp.find('.'), timestamp.size() - 1);
-		frame->timestamp = boost::lexical_cast<unsigned long>(timestamp);
-		frame->fileName = recordDirectory + '/' + *it;
-		
-		
-		//cout << "Frame:" << frame->type << " " << frame->currenttime << " " << frame->fileName  << endl;
-		switch(frame->type) {
-			case 'r' :	rgbFrames.push_back(frame);break;
-			case 'd' :	depthFrames.push_back(frame);break;
-			default: break;
+			string timestamp = frameInfo[2];
+			timestamp.erase(timestamp.find('.'), timestamp.size() - 1);
+			frame->timestamp = boost::lexical_cast<unsigned long>(timestamp);
+			frame->fileName = recordDirectory + '/' + *it;
+			
+			
+			//cout << "Frame:" << frame->type << " " << frame->currenttime << " " << frame->fileName  << endl;
+			switch(frame->type) {
+				case 'r' :	rgbFrames.push_back(frame);break;
+				case 'd' :	depthFrames.push_back(frame);break;
+				default: break;
+			}
 		}
 		
     }
@@ -111,16 +112,16 @@ int KinectRecord::open(string fileName)
     cout << "Depth Frames:" << '\t' << depthFrames.size() << endl;
 
 	for(vector<Frame*>::iterator it = depthFrames.begin(); it != depthFrames.end(); ++it) {
-		
+		cout << "Frame nr:\t" << cnt++ << endl;
 		if(fileExists((*it)->fileName)) {
 			Frames *f = new Frames;
 			f->depthFrame = **it;
 			f->rgbFrame = getRgbFrameFromCurrenttime((*it)->currenttime, rgbFrames);
 			frames.push_back(f);
-
-			cout << "Frame nr:\t" << cnt++ << endl;
 			cout << "Depth:\t" << f->depthFrame.fileName << endl;
 			cout << "Rgb:\t" << f->rgbFrame.fileName << endl;
+		} else {
+			cout << "File error!" << endl;
 		}
 	}
 
